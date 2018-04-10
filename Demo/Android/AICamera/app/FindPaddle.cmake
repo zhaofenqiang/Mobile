@@ -67,6 +67,10 @@ function(third_party_library TARGET_NAME HEADER_NAME LIBRARY_NAME)
   find_library(${TARGET_NAME}_STATIC_LIBRARY NAMES ${LIBRARY_NAME} PATHS
       ${THIRD_PARTY_ROOT}/${TARGET_NAME}/lib/${ANDROID_ABI}
       NO_DEFAULT_PATH)
+   
+  #message("${TARGET_NAME}_INC_DIR: ${${TARGET_NAME}_INC_DIR}")
+  #message("${TARGET_NAME}_STATIC_LIBRARY:${${TARGET_NAME}_STATIC_LIBRARY}")
+   
   if(${TARGET_NAME}_INC_DIR AND ${TARGET_NAME}_STATIC_LIBRARY)
     add_library(${TARGET_NAME} STATIC IMPORTED)
     set_target_properties(${TARGET_NAME} PROPERTIES IMPORTED_LOCATION
@@ -80,7 +84,7 @@ function(third_party_library TARGET_NAME HEADER_NAME LIBRARY_NAME)
 endfunction()
 
 set(PADDLE_THIRD_PARTY_LIBRARIES)
-third_party_library(protobuf google/protobuf/message.h protobuf)
+third_party_library(protobuf google/protobuf/message.h protobuf-lite)
 third_party_library(glog glog/logging.h glog)
 third_party_library(openblas cblas.h openblas)
 third_party_library(gflags gflags/gflags.h gflags)

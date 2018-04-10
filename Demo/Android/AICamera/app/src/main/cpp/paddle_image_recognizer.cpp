@@ -36,6 +36,7 @@ limitations under the License */
   fprintf(stderr, "[" TAG "]Error: " format "\n", ##__VA_ARGS__)
 #endif
 
+/* zfq at 2018.3.30:  static declared at "error.h"
 static const char* paddle_error_string(paddle_error status) {
   switch (status) {
     case kPD_NULLPTR:
@@ -52,6 +53,7 @@ static const char* paddle_error_string(paddle_error status) {
       return "";
   };
 }
+*/
 
 #define CHECK(stmt)                                   \
   do {                                                \
@@ -217,8 +219,8 @@ void ImageRecognizer::infer(const unsigned char* pixels,
                             Result& result) {
   if (height < normed_height_ || width < normed_width_) {
     LOGE(
-        "Image size should be no less than the normed size (%u vs %u, %u vs "
-        "%u).\n",
+        "Image size should be no less than the normed size (%ld vs %ld, %ld vs "
+        "%ld).\n",
         height,
         normed_height_,
         width,

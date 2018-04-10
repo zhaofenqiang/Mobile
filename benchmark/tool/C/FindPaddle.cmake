@@ -9,7 +9,7 @@ endif()
 include_directories(${PADDLE_ROOT}/include)
 
 set(THIRD_PARTY_LIBRARYS)
-list(APPEND THIRD_PARTY_LIBRARYS -lglog -lgflags -lprotobuf -lz)
+list(APPEND THIRD_PARTY_LIBRARYS -lglog -lgflags -lprotobuf-lite -lz)
 link_directories(${PADDLE_ROOT}/lib/${ANDROID_ABI})
 link_directories(${PADDLE_ROOT}/third_party/gflags/lib/${ANDROID_ABI})
 link_directories(${PADDLE_ROOT}/third_party/glog/lib/${ANDROID_ABI})

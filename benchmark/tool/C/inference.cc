@@ -149,8 +149,9 @@ int main(int argc, char* argv[]) {
                                            /* isTrain */ false);
 
   {
-    Timer time("forward time", 20);
-    for (int i = 0; i < 20; i++) {
+    Timer time("forward time", 5);
+    for (int i = 0; i < 5; i++) {
+      std::cout << "itetration " << i << std::endl;
       error |= paddle_gradient_machine_forward(machine,
                                                in_args,
                                                out_args,

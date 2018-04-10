@@ -32,6 +32,8 @@ endif()
 project(inference CXX C)
 include(FindPaddle)
 
+LINK_DIRECTORIES("/home/zfq/MobileRaw/Paddle/ComputeLibrary/lib")  
+
 aux_source_directory(. SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
@@ -42,10 +44,14 @@ if(ANDROID_ABI)
                           -Wl,--start-group -Wl,--whole-archive -lpaddle_capi_layers
                           -Wl,--no-whole-archive -lpaddle_capi_engine -Wl,--end-group
                           ${THIRD_PARTY_LIBRARYS}
-                          log)
+                          log
+                          libarm_compute-static.a
+                          libarm_compute_core-static.a)
 else()
     target_link_libraries(${PROJECT_NAME}
                     -Wl,--start-group -Wl,--whole-archive -lpaddle_capi_whole
                     -Wl,--no-whole-archive -Wl,--end-group
-                    ${THIRD_PARTY_LIBRARYS} -lrt -ldl -lpthread)
+                    ${THIRD_PARTY_LIBRARYS} -lrt -ldl -lpthread
+                    libarm_compute-static.a
+                    libarm_compute_core-static.a)
 endif()

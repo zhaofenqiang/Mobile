@@ -22,7 +22,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/")
 
 # Prebuilt third-party library: paddle
 set(PADDLE_ROOT ${CMAKE_SOURCE_DIR}/paddle-android)
-find_package(Paddle)
+#find_package(Paddle)
 
 set(SRC_FILES src/main/cpp/image_recognizer_jni.cpp
               src/main/cpp/paddle_image_recognizer.cpp
@@ -30,14 +30,19 @@ set(SRC_FILES src/main/cpp/image_recognizer_jni.cpp
               src/main/cpp/image_utils.cpp)
 
 set(LINK_FLAGS "-Wl,--version-script ${CMAKE_CURRENT_SOURCE_DIR}/paddle_jni.map")
+include_directories("${PADDLE_ROOT}/include")       
+LINK_DIRECTORIES("${PADDLE_ROOT}/lib/${ANDROID_ABI}")  
+#LINK_LIBRARIES("${PADDLE_ROOT}/third_party/ComputeLibrary/lib/libarm_compute.so")
+
 add_library(paddle_image_recognizer SHARED ${SRC_FILES})
 set_target_properties(paddle_image_recognizer PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
-target_include_directories(paddle_image_recognizer PRIVATE
-                           ${PADDLE_INC_DIR})
+#target_include_directories(paddle_image_recognizer PRIVATE
+ #                          "${PADDLE_ROOT}/third_party/ComputeLibrary/include" 
+  #                         "${PADDLE_ROOT}/third_party/ComputeLibrary")
 
-target_link_libraries(paddle_image_recognizer
-                      ${PADDLE_LIBRARIES}
-                      ${PADDLE_THIRD_PARTY_LIBRARIES}
-                      android
-                      log)
+target_link_libraries(paddle_image_recognizer 
+                           libpaddle_capi_shared.so
+                           libarm_compute.so
+                           android log)
+
