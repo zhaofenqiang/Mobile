@@ -14,6 +14,7 @@ limitations under the License. */
 
 #include <stdio.h>
 #include <time.h>
+#include <stdio.h>
 #include <iostream>
 
 #include <paddle/capi.h>
@@ -63,6 +64,8 @@ int main(int argc, char* argv[]) {
   std::string predict_model;
   std::string merged_model;
   int input_size;
+ 
+ /*
   for (int i = 1; i < argc; ++i) {
     if (std::string(argv[i]) == "--predict_config") {
       predict_config = std::string(argv[++i]);
@@ -74,6 +77,10 @@ int main(int argc, char* argv[]) {
       input_size = atoi(argv[++i]);
     }
   }
+  */
+
+  merged_model = "./mobile_flower102.paddle";
+  input_size - 150528;
 
   {
     Timer time("init paddle");
@@ -131,10 +138,17 @@ int main(int argc, char* argv[]) {
   // Get First row.
   error |= paddle_matrix_get_row(mat, 0, &array);
 
-  for (int i = 0; i < input_size; ++i) {
-    array[i] = rand() / ((float)RAND_MAX);
+  FILE * cat = fopen("/home/zfq/Paddle/paddle/capi/examples/model_inference/vgg16/cat_224.txt", "r");
+  if(cat){
+	  int i = 0;
+	  double tmp= 0.0;
+	  while(fscanf(cat,"%lf",&tmp)!=EOF){
+		  array[i] = tmp;
+		  i++;
+	  }
+	  printf("\n %d numbers have bee loaded. \n", i);
+	  fclose(cat);
   }
-
   error |= paddle_arguments_set_value(in_args, 0, mat);
 
   paddle_arguments out_args = paddle_arguments_create_none();
@@ -156,6 +170,29 @@ int main(int argc, char* argv[]) {
                                                in_args,
                                                out_args,
                                                /* isTrain */ false);
+                                               
+    paddle_matrix prob = paddle_matrix_create_none();
+    // Access the matrix of the output argument, the predicted result is stored in
+    // which.
+    paddle_arguments_get_value(out_args, 0, prob);
+
+    uint64_t height;
+    uint64_t width;
+    paddle_matrix_get_shape(prob, &height, &width);
+    paddle_matrix_get_row(prob, 0, &array);
+
+    printf("\n-----------Top 1 predictions----------\n");
+    int acl_tmp = 0;
+    int acl_idx = 0;
+    for (int i = 0; i < 999; ++i) {
+	  if (array[i] > acl_tmp){
+	  	acl_tmp = array[i];
+		acl_idx = i;
+	}
+  }
+  
+  printf("Prob: %.4f, ID: %d \n", array[acl_idx], acl_idx);                                               
+                                               
     }
   }
 
