@@ -1,75 +1,28 @@
 # Inference demo
 
-This is an inference demo program based on the C API of PaddlePaddle.
-The demo explained here is based on the C++ code, so we need to use g++ or clang++ to compile.
+This is an inference demo program based on the C API of [PaddleOnACL](https://github.com/zhaofenqiang/PaddleOnACL).
 The demo can be run from the command line and can be used to test the inference performance of various different models.
 
-## Android
-To compile and run this demo in an Android environment, please follow the following steps:
+# Run it on Raspberry Pi 3
 
-- **Step 1, build PaddlePaddle for Android.**
+- **Step 1, [Build PadlleOnACL for Raspberry Pi 3](https://github.com/zhaofenqiang/PaddleOnACL/blob/develop/Installation.md#build-for-raspberry-pi)**
 
-  Refer to [this document](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/mobile/cross_compiling_for_android_en.md) to compile the Android version of PaddlePaddle. After following the mentioned steps, make install will generate an output directory containing three subdirectories: include, lib, and third_party( `libpaddle_capi_shared.so` will be produced in the `lib` directory).
-
-- **Step 2, build the inference demo.**
-
-  Compile `inference.cc` to an executable program for the Android environment as follows:
-
-    - For armeabi-v7a
-
-    ```bash
-    $ git clone https://github.com/PaddlePaddle/Mobile.git
-    $ cd Mobile/benchmark/tool/C/
-    $ mkdir build
-    $ cd build
-
-    $ cmake .. \
-            -DANDROID_ABI=armeabi-v7a \
-            -DANDROID_STANDALONE_TOOLCHAIN=your/path/to/arm_standalone_toolchain \
-            -DPADDLE_ROOT=The output path generated in the first step \
-            -DCMAKE_BUILD_TYPE=MinSizeRel
-
-    $ make
+- **Step 2, Copy the shared library and related head files to Raspberry Pi**
+- **Step 3, build the inference demo.**  
+Compile `inference.cc` to an executable program for the Raspberry Pi environment as follows:
     ```
-
-    - For arm64-v8a
-
-    ```bash
-    $ git clone https://github.com/PaddlePaddle/Mobile.git
-    $ cd Mobile/benchmark/tool/C/
-    $ mkdir build
-    $ cd build
-
-    $ cmake .. \
-            -DANDROID_ABI=arm64-v8a \
-            -DANDROID_STANDALONE_TOOLCHAIN=your/path/to/arm64_standalone_toolchain \
-            -DPADDLE_ROOT=The output path generated in the first step \
-            -DCMAKE_BUILD_TYPE=MinSizeRel
-
-    $ make
+    arm-linux-gnueabihf-g++ inference.cpp -ICAPI_RPI/include -std=c++11 -LpaddleonACL -LComputeLibrary/lib -lpaddle_capi_shared -larm_compute -larm_compute_core -o inference -g
     ```
+    Make sure you can find the library using `-L` `-l`
 
-- **Step 3, prepare a merged model.**
+- **Step 4, [prepare a merged model](https://github.com/PaddlePaddle/Mobile/blob/develop/benchmark/tool/C/README.md)**
 
-  Models config(.py) (eg: [Mobilenet](https://github.com/PaddlePaddle/Mobile/blob/develop/models/mobilenet.py)) contain only the structure of our models. A developer can choose [model config here](https://github.com/PaddlePaddle/Mobile/tree/develop/models) to train their custom models. PaddlePaddle documentation has [several tutorials](https://github.com/PaddlePaddle/models) for building and training models. The model parameter file(.tar.gz) will be generated during the training process. There we need to merge the configuration file(.py) and the parameter file(.tar.gz) into a file. Please refer to the [details.](https://github.com/PaddlePaddle/Mobile/tree/develop/tools/merge_config_parameters)
-
-- **Step 4, run the demo.**
-
-  Users can run the demo program by logging into the Android environment via [adb](https://developer.android.google.cn/studio/command-line/adb.html?hl=zh-cn#Enabling) and specifying the PaddlePaddle model from the command line as follows:
-
-    ```bash
-    $ adb push inference /data/local/tmp # transfer the executable to Android's memory
-    $ adb push mobilenet_flowers102.paddle /data/local/tmp # transfer the model to Android's memory
-    $ adb shell # login Android device
-    odin:/ $ cd /data/local/tmp # switch to the working directory
-    odin:/data/local/tmp $ ls
-    inference  mobilenet_flowers102.paddle
-    odin:/data/local/tmp $ chmod +x inference
-    odin:/data/local/tmp $ ./inference --merged_model ./mobilenet_flowers102.paddle --input_size 150528 # run the executable
-    I1211 17:12:53.334666  4858 Util.cpp:166] commandline:
-    Time of init paddle 3.4388 ms.
-    Time of create from merged model file 141.045 ms.
-    Time of forward time 398.818 ms.
+- **Step 5, run the demo.**
     ```
-
+    export LD_LIBRARY_PATH=/home/zfq/mobile/paddleonACL:/home/zfq/mobile/ComputeLibrary/lib
+    ./inference --merged_model ./mobilenet_flowers102.paddle --input_size 150528
+    ```
     **Note:** `input_size` is 150528, cause that the input size of the model is `3 * 224 * 224 = 150528`
+
+# Run it on Android
+Please following this [guide](https://github.com/PaddlePaddle/Mobile/blob/develop/benchmark/tool/C/README.md), just replace the shared and static library.
